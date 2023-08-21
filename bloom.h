@@ -3,16 +3,13 @@
 
 struct commit;
 struct repository;
-struct commit_graph;
 
 struct bloom_filter_settings {
 	/*
 	 * The version of the hashing technique being used.
-	 * The newest version is 2, which is
+	 * We currently only support version = 1 which is
 	 * the seeded murmur3 hashing technique implemented
-	 * in bloom.c. Bloom filters of version 1 were created
-	 * with prior versions of Git, which had a bug in the
-	 * implementation of the hash function.
+	 * in bloom.c.
 	 */
 	uint32_t hash_version;
 
@@ -71,10 +68,6 @@ struct bloom_key {
 	uint32_t *hashes;
 };
 
-int load_bloom_filter_from_graph(struct commit_graph *g,
-				 struct bloom_filter *filter,
-				 uint32_t graph_pos);
-
 /*
  * Calculate the murmur3 32-bit hash value for the given data
  * using the given seed.
@@ -82,7 +75,7 @@ int load_bloom_filter_from_graph(struct commit_graph *g,
  * Not considered to be cryptographically secure.
  * Implemented as described in https://en.wikipedia.org/wiki/MurmurHash#Algorithm
  */
-uint32_t murmur3_seeded_v2(uint32_t seed, const char *data, size_t len);
+uint32_t murmur3_seeded(uint32_t seed, const char *data, size_t len);
 
 void fill_bloom_key(const char *data,
 		    size_t len,
