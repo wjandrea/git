@@ -985,19 +985,11 @@ struct parse_event_data {
 	const struct config_parse_options *opts;
 };
 
-static int do_event(struct config_source *cs, enum config_event_t type,
-		    struct parse_event_data *data)
+static size_t get_corrected_offset(struct config_source *cs,
+				   enum config_event_t type)
 {
-	size_t offset;
+	size_t offset = cs->do_ftell(cs);
 
-	if (!data->opts || !data->opts->event_fn)
-		return 0;
-
-	if (type == CONFIG_EVENT_WHITESPACE &&
-	    data->previous_type == type)
-		return 0;
-
-	offset = cs->do_ftell(cs);
 	/*
 	 * At EOF, the parser always "inserts" an extra '\n', therefore
 	 * the end offset of the event is the current file position, otherwise
@@ -1005,14 +997,44 @@ static int do_event(struct config_source *cs, enum config_event_t type,
 	 */
 	if (type != CONFIG_EVENT_EOF)
 		offset--;
+	return offset;
+}
+
+static void start_event(struct config_source *cs, enum config_event_t type,
+		       struct parse_event_data *data)
+{
+	data->previous_type = type;
+	data->previous_offset = get_corrected_offset(cs, type);
+}
+
+static int flush_event(struct config_source *cs, enum config_event_t type,
+		       struct parse_event_data *data)
+{
+	if (!data->opts || !data->opts->event_fn)
+		return 0;
+
+	if (type == CONFIG_EVENT_WHITESPACE &&
+	    data->previous_type == type)
+		return 0;
 
 	if (data->previous_type != CONFIG_EVENT_EOF &&
 	    data->opts->event_fn(data->previous_type, data->previous_offset,
-				 offset, cs, data->opts->event_fn_data) < 0)
+				 get_corrected_offset(cs, type), cs,
+				 data->opts->event_fn_data) < 0)
 		return -1;
 
-	data->previous_type = type;
-	data->previous_offset = offset;
+	return 1;
+}
+
+static int do_event(struct config_source *cs, enum config_event_t type,
+		    struct parse_event_data *data)
+{
+	int maybe_ret;
+
+	if ((maybe_ret = flush_event(cs, type, data)) < 1)
+		return maybe_ret;
+
+	start_event(cs, type, data);
 
 	return 0;
 }
