@@ -388,7 +388,7 @@ static void process_trailers_lists(struct list_head *head,
 int trailer_set_where(enum trailer_where *item, const char *value)
 {
 	if (!value)
-		*item = WHERE_UNSPECIFIED;
+		*item = WHERE_DEFAULT;
 	else if (!strcasecmp("after", value))
 		*item = WHERE_AFTER;
 	else if (!strcasecmp("before", value))
@@ -405,7 +405,7 @@ int trailer_set_where(enum trailer_where *item, const char *value)
 int trailer_set_if_exists(enum trailer_if_exists *item, const char *value)
 {
 	if (!value)
-		*item = EXISTS_UNSPECIFIED;
+		*item = EXISTS_DEFAULT;
 	else if (!strcasecmp("addIfDifferent", value))
 		*item = EXISTS_ADD_IF_DIFFERENT;
 	else if (!strcasecmp("addIfDifferentNeighbor", value))
@@ -424,7 +424,7 @@ int trailer_set_if_exists(enum trailer_if_exists *item, const char *value)
 int trailer_set_if_missing(enum trailer_if_missing *item, const char *value)
 {
 	if (!value)
-		*item = MISSING_UNSPECIFIED;
+		*item = MISSING_DEFAULT;
 	else if (!strcasecmp("doNothing", value))
 		*item = MISSING_DO_NOTHING;
 	else if (!strcasecmp("add", value))
@@ -586,10 +586,7 @@ static void ensure_configured(void)
 	if (configured)
 		return;
 
-	/*
-	 * Default config must be setup first. These defaults are used if there
-	 * are no "trailer.*" or "trailer.<token>.*" options configured.
-	 */
+	/* Default config must be setup first */
 	default_conf_info.where = WHERE_END;
 	default_conf_info.if_exists = EXISTS_ADD_IF_DIFFERENT_NEIGHBOR;
 	default_conf_info.if_missing = MISSING_ADD;
@@ -704,11 +701,11 @@ static void add_arg_item(struct list_head *arg_head, char *tok, char *val,
 	new_item->value = val;
 	duplicate_conf(&new_item->conf, conf);
 	if (new_trailer_item) {
-		if (new_trailer_item->where != WHERE_UNSPECIFIED)
+		if (new_trailer_item->where != WHERE_DEFAULT)
 			new_item->conf.where = new_trailer_item->where;
-		if (new_trailer_item->if_exists != EXISTS_UNSPECIFIED)
+		if (new_trailer_item->if_exists != EXISTS_DEFAULT)
 			new_item->conf.if_exists = new_trailer_item->if_exists;
-		if (new_trailer_item->if_missing != MISSING_UNSPECIFIED)
+		if (new_trailer_item->if_missing != MISSING_DEFAULT)
 			new_item->conf.if_missing = new_trailer_item->if_missing;
 	}
 	list_add_tail(&new_item->list, arg_head);
