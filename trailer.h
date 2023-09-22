@@ -37,10 +37,11 @@ struct trailer_info {
 	int blank_line_before_trailer;
 
 	/*
-	 * Offsets to the trailer block start and end positions in the input
-	 * string. If no trailer block is found, these are set to 0.
+	 * Pointers to the start and end of the trailer block found. If there
+	 * is no trailer block found, these 2 pointers point to the end of the
+	 * input string.
 	 */
-	size_t trailer_start, trailer_end;
+	const char *trailer_start, *trailer_end;
 
 	/*
 	 * Array of trailers found.
