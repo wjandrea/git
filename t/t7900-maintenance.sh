@@ -55,6 +55,8 @@ test_expect_success 'run [--auto|--quiet]' '
 '
 
 test_expect_success 'maintenance.auto config option' '
+	rm -rf .git &&
+	git init &&
 	GIT_TRACE2_EVENT="$(pwd)/default" git commit --quiet --allow-empty -m 1 &&
 	test_subcommand git maintenance run --auto --quiet <default &&
 	GIT_TRACE2_EVENT="$(pwd)/true" \
