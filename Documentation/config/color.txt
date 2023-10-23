@@ -92,6 +92,8 @@ color.decorate.<slot>::
 	the stash ref
 `grafted`;;
 	grafted and replaced commits
+`symbol`;;
+	punctuation symbols surrounding the other elements
 --
 
 color.grep::
