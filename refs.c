@@ -565,13 +565,16 @@ void normalize_glob_ref(struct string_list_item *item, const char *prefix,
 
 	if (prefix)
 		strbuf_addstr(&normalized_pattern, prefix);
-	else if (!starts_with(pattern, "refs/") &&
-		   strcmp(pattern, "HEAD"))
-		strbuf_addstr(&normalized_pattern, "refs/");
-	/*
-	 * NEEDSWORK: Special case other symrefs such as REBASE_HEAD,
-	 * MERGE_HEAD, etc.
-	 */
+	else if (!starts_with(pattern, "refs/") && strcmp(pattern, "HEAD")) {
+		int i;
+
+		for (i = 0; i < ARRAY_SIZE(pseudorefs); i++)
+			if (!strcmp(pattern, pseudorefs[i]))
+				break;
+
+		if (i == ARRAY_SIZE(pseudorefs))
+			strbuf_addstr(&normalized_pattern, "refs/");
+	}
 
 	strbuf_addstr(&normalized_pattern, pattern);
 	strbuf_strip_suffix(&normalized_pattern, "/");
