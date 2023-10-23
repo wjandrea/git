@@ -92,6 +92,8 @@ color.decorate.<slot>::
 	the stash ref
 `ref`;;
 	any other refs (not shown by default)
+`pseudoref`;;
+	pseudorefs such as ORIG_HEAD or MERGE_HEAD (not shown by default)
 `grafted`;;
 	grafted and replaced commits
 `symbol`;;
@@ -99,7 +101,7 @@ color.decorate.<slot>::
 --
 +
 (Variable `log.initialDecorationSet` or linkgit:git-log[1] option
-`--clear-decorations` can be used to show all refs.)
+`--clear-decorations` can be used to show all refs and pseudorefs.)
 
 color.grep::
 	When set to `always`, always highlight matches.  When `false` (or
