@@ -17,6 +17,7 @@ test_expect_success setup '
 	git config color.decorate.remoteBranch red &&
 	git config color.decorate.tag "reverse bold yellow" &&
 	git config color.decorate.stash magenta &&
+	git config color.decorate.ref blue &&
 	git config color.decorate.grafted black &&
 	git config color.decorate.symbol white &&
 	git config color.decorate.HEAD cyan &&
@@ -28,11 +29,13 @@ test_expect_success setup '
 	c_remoteBranch="<RED>" &&
 	c_tag="<BOLD;REVERSE;YELLOW>" &&
 	c_stash="<MAGENTA>" &&
+	c_ref="<BLUE>" &&
 	c_HEAD="<CYAN>" &&
 	c_grafted="<BLACK>" &&
 	c_symbol="<WHITE>" &&
 
 	test_commit A &&
+	git update-ref refs/foo A &&
 	git clone . other &&
 	(
 		cd other &&
@@ -65,10 +68,12 @@ ${c_remoteBranch}other/main${c_reset}${c_symbol})${c_reset} A1
 	${c_commit}COMMIT_ID${c_reset}${c_symbol} (${c_reset}\
 ${c_stash}refs/stash${c_reset}${c_symbol})${c_reset} On main: Changes to A.t
 	${c_commit}COMMIT_ID${c_reset}${c_symbol} (${c_reset}\
-${c_tag}tag: ${c_reset}${c_tag}A${c_reset}${c_symbol})${c_reset} A
+${c_tag}tag: ${c_reset}${c_tag}A${c_reset}${c_symbol}, ${c_reset}\
+${c_ref}refs/foo${c_reset}${c_symbol})${c_reset} A
 	EOF
 
-	git log --first-parent --no-abbrev --decorate --oneline --color=always --all >actual &&
+	git log --first-parent --no-abbrev --decorate --clear-decorations \
+		--oneline --color=always --all >actual &&
 	cmp_filtered_decorations
 '
 

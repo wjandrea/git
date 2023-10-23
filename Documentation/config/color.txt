@@ -90,11 +90,16 @@ color.decorate.<slot>::
 	lightweight and annotated tags
 `stash`;;
 	the stash ref
+`ref`;;
+	any other refs (not shown by default)
 `grafted`;;
 	grafted and replaced commits
 `symbol`;;
 	punctuation symbols surrounding the other elements
 --
++
+(Variable `log.initialDecorationSet` or linkgit:git-log[1] option
+`--clear-decorations` can be used to show all refs.)
 
 color.grep::
 	When set to `always`, always highlight matches.  When `false` (or

@@ -39,6 +39,7 @@ static char decoration_colors[][COLOR_MAXLEN] = {
 	[DECORATION_REF_REMOTE]	= GIT_COLOR_BOLD_RED,
 	[DECORATION_REF_TAG]	= GIT_COLOR_BOLD_YELLOW,
 	[DECORATION_REF_STASH]	= GIT_COLOR_BOLD_MAGENTA,
+	[DECORATION_REF]	= GIT_COLOR_BOLD_MAGENTA,
 	[DECORATION_REF_HEAD]	= GIT_COLOR_BOLD_CYAN,
 	[DECORATION_GRAFTED]	= GIT_COLOR_BOLD_BLUE,
 	[DECORATION_SYMBOL]	= GIT_COLOR_NIL,
@@ -49,6 +50,7 @@ static const char *color_decorate_slots[] = {
 	[DECORATION_REF_REMOTE] = "remoteBranch",
 	[DECORATION_REF_TAG]	= "tag",
 	[DECORATION_REF_STASH]	= "stash",
+	[DECORATION_REF]	= "ref",
 	[DECORATION_REF_HEAD]	= "HEAD",
 	[DECORATION_GRAFTED]	= "grafted",
 	[DECORATION_SYMBOL]	= "symbol",
@@ -151,7 +153,7 @@ static int add_ref_decoration(const char *refname, const struct object_id *oid,
 	int i;
 	struct object *obj;
 	enum object_type objtype;
-	enum decoration_type deco_type = DECORATION_NONE;
+	enum decoration_type deco_type = DECORATION_REF;
 	struct decoration_filter *filter = (struct decoration_filter *)cb_data;
 	const char *git_replace_ref_base = ref_namespace[NAMESPACE_REPLACE].ref;
 
