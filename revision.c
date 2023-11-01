@@ -6,7 +6,6 @@
 #include "object-name.h"
 #include "object-file.h"
 #include "object-store-ll.h"
-#include "oidset.h"
 #include "tag.h"
 #include "blob.h"
 #include "tree.h"
@@ -1113,9 +1112,6 @@ static int process_parents(struct rev_info *revs, struct commit *commit,
 
 	if (commit->object.flags & ADDED)
 		return 0;
-	if (revs->do_not_die_on_missing_objects &&
-	    oidset_contains(&revs->missing_commits, &commit->object.oid))
-		return 0;
 	commit->object.flags |= ADDED;
 
 	if (revs->include_check &&
@@ -1172,8 +1168,7 @@ static int process_parents(struct rev_info *revs, struct commit *commit,
 	for (parent = commit->parents; parent; parent = parent->next) {
 		struct commit *p = parent->item;
 		int gently = revs->ignore_missing_links ||
-			     revs->exclude_promisor_objects ||
-			     revs->do_not_die_on_missing_objects;
+			     revs->exclude_promisor_objects;
 		if (repo_parse_commit_gently(revs->repo, p, gently) < 0) {
 			if (revs->exclude_promisor_objects &&
 			    is_promisor_object(&p->object.oid)) {
@@ -1181,11 +1176,7 @@ static int process_parents(struct rev_info *revs, struct commit *commit,
 					break;
 				continue;
 			}
-
-			if (revs->do_not_die_on_missing_objects)
-				oidset_insert(&revs->missing_commits, &p->object.oid);
-			else
-				return -1; /* corrupt repository */
+			return -1;
 		}
 		if (revs->sources) {
 			char **slot = revision_sources_at(revs->sources, p);
@@ -3118,7 +3109,6 @@ void release_revisions(struct rev_info *revs)
 	clear_decoration(&revs->merge_simplification, free);
 	clear_decoration(&revs->treesame, free);
 	line_log_free(revs);
-	oidset_clear(&revs->missing_commits);
 }
 
 static void add_child(struct rev_info *revs, struct commit *parent, struct commit *child)
@@ -3809,8 +3799,6 @@ int prepare_revision_walk(struct rev_info *revs)
 		for_each_packed_object(mark_uninteresting, revs,
 				       FOR_EACH_OBJECT_PROMISOR_ONLY);
 	}
-
-	oidset_init(&revs->missing_commits, 0);
 
 	if (!revs->reflog_info)
 		prepare_to_use_bloom_filter(revs);
