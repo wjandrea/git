@@ -580,12 +580,13 @@ test_expect_success 'builtin object mode attributes work (dir and regular paths)
 '
 
 test_expect_success POSIXPERM 'builtin object mode attributes work (executable)' '
-	>exec && chmod +x exec &&
+	>exec &&
+	chmod +x exec &&
 	attr_check_object_mode exec 100755
 '
 
 test_expect_success SYMLINKS 'builtin object mode attributes work (symlinks)' '
-	>to_sym ln -s to_sym sym &&
+	ln -s to_sym sym &&
 	attr_check_object_mode sym 120000
 '
 
